@@ -1,0 +1,44 @@
+Catalogue root: C:\Users\User\OneDrive\Desktop\Firework_catalogues\2026
+Products loaded: 85
+Categories loaded: 2
+Collections loaded: 6
+Collection-item assignments: 85
+Products with no assignment: 0
+Assignments referencing unknown products: 0
+Assignments referencing unknown categories: 0
+Assignments referencing unknown collections: 0
+Missing image files referenced by CSV: 0
+Missing video files referenced by CSV: 0
+Products with no media filename: 0
+Products with invalid assignments: 0
+Collection/category mismatches: 0
+
+Unassigned product IDs: []
+Unknown product IDs in collection-items: []
+Unknown category IDs: []
+Unknown collection IDs: []
+
+MISSING IMAGE FILES:
+Empty DataFrame
+Columns: [id, name, image_path]
+Index: []
+
+MISSING VIDEO FILES:
+Empty DataFrame
+Columns: [id, name, video_path]
+Index: []
+
+PRODUCTS WITH NO MEDIA:
+Empty DataFrame
+Columns: [id, name, folder]
+Index: []
+
+INVALID ASSIGNMENTS:
+Empty DataFrame
+Columns: [id, name, category_id, collection_id]
+Index: []
+
+CATEGORY MISMATCHES:
+Empty DataFrame
+Columns: [id, name, category_id, collection_id]
+Index: []

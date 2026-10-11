@@ -1,0 +1,4 @@
+id,category_id,name,slug,sort_order,image_path,description
+SC01,big,New Year Edition,other-cakes-review-size,4,collections/SC01/cover.jpg,
+SC02,,Christmas,,,collections/SC02/cover.jpg,
+SC03,,Halloween,,,collections/SC03/cover.jpg,
