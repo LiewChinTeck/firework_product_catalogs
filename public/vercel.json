@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/share/[code].js": {
-      "includeFiles": "2026/products.csv"
-    }
-  }
-}

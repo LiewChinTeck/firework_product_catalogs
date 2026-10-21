@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/share/[code].js": {
+      "includeFiles": "public/2026/products.csv"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/share/:code",
+      "destination": "/api/share/:code"
+    }
+  ]
+}
