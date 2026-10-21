@@ -533,6 +533,25 @@
     .collection-grid::-webkit-scrollbar{display:none;width:0;height:0}
     .product-art{padding:0}
     .product-art img,.product-art video{width:100%;height:100%;object-fit:cover}
+    
+.product-card {
+  position: relative;
+}
+
+.copy-product-link {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+
   </style>
 </head>
 
@@ -875,6 +894,33 @@
       card.setAttribute("aria-label", `View ${product.name}`);
 
       card.appendChild(makeProductArt(product));
+      
+const copyButton = document.createElement("button");
+copyButton.type = "button";
+copyButton.className = "copy-product-link";
+copyButton.title = "Copy product link";
+copyButton.setAttribute("aria-label", "Copy product link");
+copyButton.textContent = "▢";
+
+copyButton.addEventListener("click", async (event) => {
+  event.stopPropagation();
+
+const url = new URL(
+  `/share/${encodeURIComponent(product.code)}`,
+  window.location.origin
+);
+
+  try {
+    await navigator.clipboard.writeText(url.href);
+    copyButton.textContent = "✓";
+    setTimeout(() => copyButton.textContent = "▢", 1500);
+  } catch {
+    alert("Unable to copy link. Please use HTTPS or localhost.");
+  }
+});
+
+card.appendChild(copyButton);
+
 
       const info = document.createElement("div");
       info.className = "product-info";
@@ -1078,53 +1124,14 @@
       videoFrame.replaceChildren(text);
     }
 
+
     function openProduct(product) {
-      lastFocusedElement = document.activeElement;
-      modalTitle.textContent = product.name;
-
-      videoFrame.replaceChildren();
-
       if (product.video) {
-        const video = document.createElement("video");
-        video.controls = true;
-        video.autoplay = true;
-        video.playsInline = true;
-        video.preload = "metadata";
-        video.src = product.video;
-
-        video.addEventListener("error", () => {
-          if (currentVideo !== video) return;
-
-          if (product.image) {
-            showProductImage(product);
-          } else {
-            showUnavailable(
-              "This video could not be played. Check the video file path and format."
-            );
-          }
-        });
-
-        currentVideo = video;
-        videoFrame.appendChild(video);
-
-        const playAttempt = video.play();
-        if (playAttempt && typeof playAttempt.catch === "function") {
-          playAttempt.catch(() => {
-            // Some browsers require the visitor to press Play.
-          });
-        }
+        sessionStorage.setItem("catalogueReturn", window.location.href);
+        window.location.href = product.video;
       } else if (product.image) {
-        showProductImage(product);
-      } else {
-        showUnavailable("No video or image is available for this product.");
+        window.open(product.image, "_self");
       }
-
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("modal-open");
-
-      closeButton.focus();
-      scheduleCollections();
     }
 
     function showProductImage(product) {
@@ -1253,6 +1260,18 @@
           </div>
         `;
       }
+      
+const codeFromLink = decodeURIComponent(
+  window.location.hash.replace("#product-", "")
+);
+
+if (window.location.hash.startsWith("#product-")) {
+  const product = products.find(p => p.code === codeFromLink);
+  if (product) {
+    setTimeout(() => openProduct(product), 300);
+  }
+}
+
     }
 
     function escapeHTML(value) {
