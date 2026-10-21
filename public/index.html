@@ -551,7 +551,12 @@
   cursor: pointer;
   font-size: 18px;
 }
-
+.product-card.share-highlight {
+  outline: 4px solid #ff9800;
+  outline-offset: 5px;
+  box-shadow: 0 0 24px rgba(255, 152, 0, 0.65);
+  transition: outline 0.3s ease, box-shadow 0.3s ease;
+}
   </style>
 </head>
 
@@ -802,6 +807,7 @@
 
         return {
           ...row,
+          id: getField(row, ["id", "product_id", "product id"]),
           code: code || `product-${index + 1}`,
           name: name || code || `Product ${index + 1}`,
           category: categoryRow?getCategoryName(categoryRow):"Unassigned",
@@ -891,6 +897,7 @@
       card.type = "button";
       card.className = "product-card";
       card.dataset.productCode = product.code;
+      card.dataset.productId = product.id;
       card.setAttribute("aria-label", `View ${product.name}`);
 
       card.appendChild(makeProductArt(product));
@@ -1261,14 +1268,36 @@ card.appendChild(copyButton);
         `;
       }
       
-const codeFromLink = decodeURIComponent(
-  window.location.hash.replace("#product-", "")
-);
+const hash = window.location.hash;
 
-if (window.location.hash.startsWith("#product-")) {
-  const product = products.find(p => p.code === codeFromLink);
+if (hash.startsWith("#product-")) {
+  const sharedId = decodeURIComponent(
+    hash.slice("#product-".length)
+  );
+
+  const product = products.find(
+    p => String(p.id).trim() === sharedId.trim()
+  );
+
   if (product) {
-    setTimeout(() => openProduct(product), 300);
+    setTimeout(() => {
+      const card = document.querySelector(
+        `[data-product-id="${CSS.escape(product.id)}"]`
+      );
+
+      if (!card) return;
+
+      card.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      card.classList.add("share-highlight");
+
+      setTimeout(() => {
+        card.classList.remove("share-highlight");
+      }, 3000);
+    }, 300);
   }
 }
 
