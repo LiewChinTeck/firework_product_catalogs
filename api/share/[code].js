@@ -174,6 +174,7 @@ ${image ? `
 <meta name="twitter:title" content="${escapeHTML(title)}">
 <meta name="twitter:description" content="${escapeHTML(description)}">
 <meta name="twitter:image" content="${escapeHTML(image)}">` : ""}
+<meta http-equiv="refresh" content="0;url=${escapeHTML(target)}">
 </head>
 <body>
 <p><a href="${escapeHTML(target)}">View ${escapeHTML(title)}</a></p>
