@@ -1,14 +1,17 @@
-
 {
-  "name": "firework-catalogues",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js"
+  "functions": {
+    "api/share/[code].js": {
+      "includeFiles": "public/2026/products.csv"
+    }
   },
-  "dependencies": {
-    "dotenv": "^16.0.0",
-    "express": "^4.0.0",
-    "mongodb": "^6.0.0"
-  }
+  "rewrites": [
+    {
+      "source": "/share/:code",
+      "destination": "/api/share/:code"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
 }

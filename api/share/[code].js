@@ -101,7 +101,7 @@ function escapeHTML(value) {
 
 export default function handler(req, res) {
   try {
-    const csvPath = path.join(process.cwd(), "2026", "products.csv");
+    const csvPath = path.join(process.cwd(), "public", "2026", "products.csv");
 
     if (!fs.existsSync(csvPath)) {
       return res.status(500).send("Products CSV not found.");
@@ -150,7 +150,7 @@ export default function handler(req, res) {
       `${PUBLIC_URL}/share/${encodeURIComponent(productId)}`;
 
     const target =
-      `${PUBLIC_URL}/#product-${encodeURIComponent(productCode)}`;
+      `${PUBLIC_URL}/#product-${encodeURIComponent(productId)}`;
 
     res.setHeader("Cache-Control", "public, max-age=0, s-maxage=300");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
