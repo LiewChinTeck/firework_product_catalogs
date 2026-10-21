@@ -906,7 +906,7 @@ copyButton.addEventListener("click", async (event) => {
   event.stopPropagation();
 
 const url = new URL(
-  `/share/${encodeURIComponent(product.code)}`,
+  `/share/${encodeURIComponent(product.id)}`,
   window.location.origin
 );
 
