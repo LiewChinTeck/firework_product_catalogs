@@ -936,7 +936,7 @@ const url = new URL(
   try {
     await navigator.clipboard.writeText(url.href);
     copyButton.textContent = "✅";
-    setTimeout(() => copyButton.textContent = copyIcon, 1500);
+    setTimeout(() => copyButton.innerHTML = copyIcon, 1500);
   } catch {
     alert("Unable to copy link. Please use HTTPS or localhost.");
   }
