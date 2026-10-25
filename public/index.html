@@ -184,7 +184,7 @@
     .product-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
+      gap: 1px;
     }
 
     .product-card {
@@ -286,7 +286,10 @@
       background: linear-gradient(145deg, #35214e, #8054a7);
     }
 
-    .product-info { padding: 16px; }
+    .product-info { 
+	padding: 0 px; 
+	text-align: center;
+    }
 
     .product-name {
       font-size: 16px;
@@ -437,7 +440,7 @@
 
       .collection-grid {
         display: flex;
-        gap: 14px;
+        gap: 1px;
         overflow-x: auto;
         overflow-y: hidden;
         scroll-snap-type: x mandatory;
@@ -465,7 +468,7 @@
 
       .product-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 1px;
       }
 
       .product-art {
@@ -502,8 +505,8 @@
 
     @media (max-width: 360px) {
       .collection-card { flex-basis: 90%; }
-      .product-grid { gap: 8px; }
-      .product-info { padding: 10px; }
+      .product-grid { gap: 1px; }
+      .product-info { padding: 5px; }
     }
 
     @media (max-height: 500px) {
@@ -519,7 +522,7 @@
       html { scroll-behavior: auto; }
       .product-card { transition: none; }
     }
-    .collection-grid{display:flex;gap:20px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:0;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
+    .collection-grid{display:flex;gap:1px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:0;padding-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--accent) transparent}
     .collection-grid::-webkit-scrollbar{display:block;height:6px}
     .collection-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:9px}
     .collection-card{position:relative;isolation:isolate;flex:0 0 86%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
@@ -527,7 +530,7 @@
     .collection-card.has-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#00000008 15%,#000000b8 100%);z-index:-1;pointer-events:none}
     .collection-card.has-cover h3{text-shadow:0 1px 5px #0008}
     .collection-grid:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-    @media(max-width:600px){.collection-grid{gap:14px;scroll-padding-inline:16px}.collection-card{flex-basis:85%}}
+    @media(max-width:600px){.collection-grid{gap:1px;scroll-padding-inline:16px}.collection-card{flex-basis:85%}}
     @media(max-width:360px){.collection-card{flex-basis:85%}}
     .collection-grid{scrollbar-width:none;-ms-overflow-style:none}
     .collection-grid::-webkit-scrollbar{display:none;width:0;height:0}
@@ -545,7 +548,7 @@
   z-index: 2;
   width: 34px;
   height: 34px;
-  border: 1px solid #ddd;
+  border: 0px solid #ddd;
   border-radius: 8px;
   background: white;
   cursor: pointer;
@@ -907,7 +910,7 @@ copyButton.type = "button";
 copyButton.className = "copy-product-link";
 copyButton.title = "Copy product link";
 copyButton.setAttribute("aria-label", "Copy product link");
-copyButton.textContent = "▢";
+copyButton.textContent = "🔗";
 
 copyButton.addEventListener("click", async (event) => {
   event.stopPropagation();
@@ -919,8 +922,8 @@ const url = new URL(
 
   try {
     await navigator.clipboard.writeText(url.href);
-    copyButton.textContent = "✓";
-    setTimeout(() => copyButton.textContent = "▢", 1500);
+    copyButton.textContent = "✅";
+    setTimeout(() => copyButton.textContent = "🔗", 1500);
   } catch {
     alert("Unable to copy link. Please use HTTPS or localhost.");
   }
@@ -936,11 +939,7 @@ card.appendChild(copyButton);
       name.className = "product-name";
       name.textContent = product.name;
 
-      const type = document.createElement("div");
-      type.className = "product-type";
-      type.textContent = product.category;
-
-      info.append(name, type);
+      info.append(name);
       card.appendChild(info);
 
       card.addEventListener("click", () => openProduct(product));
