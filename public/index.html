@@ -910,7 +910,20 @@ copyButton.type = "button";
 copyButton.className = "copy-product-link";
 copyButton.title = "Copy product link";
 copyButton.setAttribute("aria-label", "Copy product link");
-copyButton.textContent = "🔗";
+const copyIcon = `
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="18" height="18"
+       viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="2"
+       stroke-linecap="round"
+       stroke-linejoin="round">
+    <rect x="8" y="8" width="13" height="13" rx="2"/>
+    <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>
+  </svg>
+`;
+copyButton.innerHTML = copyIcon;
 
 copyButton.addEventListener("click", async (event) => {
   event.stopPropagation();
@@ -923,7 +936,7 @@ const url = new URL(
   try {
     await navigator.clipboard.writeText(url.href);
     copyButton.textContent = "✅";
-    setTimeout(() => copyButton.textContent = "🔗", 1500);
+    setTimeout(() => copyButton.textContent = copyIcon, 1500);
   } catch {
     alert("Unable to copy link. Please use HTTPS or localhost.");
   }
