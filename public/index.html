@@ -230,7 +230,7 @@
     .product-art video {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       display: block;
     }
 
@@ -405,7 +405,7 @@
     .video-frame img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       display: block;
       background: #111521;
     }
@@ -532,10 +532,15 @@
     .collection-grid{scrollbar-width:none;-ms-overflow-style:none}
     .collection-grid::-webkit-scrollbar{display:none;width:0;height:0}
     .product-art{padding:0}
-    .product-art img,.product-art video{width:100%;height:100%;object-fit:contain}
+    .product-art img,.product-art video{width:100%;height:100%;object-fit:cover}
     
 .product-card {
   position: relative;
+}
+
+/* Might use next time */
+.share-product-link {
+  display: none;
 }
 
 .share-product-link {
@@ -557,6 +562,55 @@
   outline-offset: 5px;
   box-shadow: 0 0 24px rgba(255, 152, 0, 0.65);
   transition: outline 0.3s ease, box-shadow 0.3s ease;
+}
+.media-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: #000;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-modal.is-open {
+  display: flex;
+}
+
+.media-modal-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.media-modal-content img,
+.media-modal-content video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.media-close {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(50, 50, 50, 0.8);
+  color: white;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
 }
   </style>
 </head>
@@ -614,7 +668,11 @@
       </div>
     </div>
   </div>
-
+  <div id="mediaModal" class="media-modal">
+    <button class="media-close" onclick="closeMediaModal()"
+            aria-label="Close">&times;</button>
+    <div id="mediaModalContent" class="media-modal-content"></div>
+  </div>
   <script>
     /*
       index.html is in the parent folder.
@@ -625,7 +683,8 @@
       products: "2026/products.csv",
       categories: "2026/categories.csv",
       collections: "2026/collections.csv",
-      items: "2026/collection-items.csv"
+      items: "2026/collection-items.csv",
+      productCategories: "2026/product-category.csv"
     };
 
     const modal = document.getElementById("video-modal");
@@ -637,6 +696,7 @@
     let categories = [];
     let collections = [];
     let collectionItems = [];
+    let productCategories = [];
     let lastFocusedElement = null;
     let currentVideo = null;
 
@@ -725,7 +785,20 @@
     function uniqueMatch(rows,ref,keys){if(!normalize(ref))return null;const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref)));return matches.length===1?matches[0]:null}
     function reference(row,groups){for(const [kind,keys] of groups)for(const key of keys)if(Object.hasOwn(row,key))return {kind,value:normalize(row[key])};return {kind:"",value:""}}
     function resolveReference(rows,ref,groups){if(!ref.value)return null;for(const keys of groups[ref.kind]||[]){const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref.value)));if(matches.length)return matches.length===1?matches[0]:null}return null}
-    function resolveCategory(row){const ref=reference(row,[["id",["category_id"]],["code",["category_code"]],["generic",["category","product_category","type"]],["name",["category_name","category_title"]]]);return resolveReference(categories,ref,{id:[["category_id","id"]],code:[["category_code","code","slug"]],name:[["category_name","name","title","category","category_title"]],generic:[["category_id","id","category_code","code","slug"],["category_name","name","title","category","category_title"]]})}
+    
+function resolveCategory(row) {
+  const productId = getField(row, ["id", "product_id"]);
+
+  const assignment = productCategories.find(item =>
+    sameId(item.product_id, productId)
+  );
+
+  if (!assignment) return null;
+
+  return categories.find(category =>
+    sameId(category.id, assignment.category_id)
+  ) || null;
+}
 
     function toBoolean(value) {
       return ["true", "1", "yes", "y"].includes(
@@ -1163,14 +1236,15 @@ const shareIcon = `
     }
 
 
-    function openProduct(product) {
-      if (product.video) {
-        sessionStorage.setItem("catalogueReturn", window.location.href);
-        window.location.href = product.video;
-      } else if (product.image) {
-        window.open(product.image, "_self");
-      }
-    }
+function openProduct(product) {
+  lastFocusedElement = document.activeElement;
+
+  if (product.video) {
+    openMediaModal(product.video, "video");
+  } else if (product.image) {
+    openMediaModal(product.image, "image");
+  }
+}
 
     function showProductImage(product) {
       currentVideo = null;
@@ -1254,16 +1328,21 @@ const shareIcon = `
     async function initCatalogue() {
       try {
         const results = await Promise.all([
-          loadCSV(DATA_FILES.products,"2026/products-linked.csv"),
+          loadCSV(DATA_FILES.products),
           loadCSV(DATA_FILES.categories),
           loadCSV(DATA_FILES.collections),
-          loadCSV(DATA_FILES.items)
+          loadCSV(DATA_FILES.items),
+          loadCSV(DATA_FILES.productCategories)
         ]);
 
         categories = results[1];
+        productCategories = results[4];
         products = normalizeProducts(results[0]);
         collections = results[2];
         collectionItems = results[3];
+
+	categories.sort((a, b) => Number(a.sort_order) - Number(b.sort_order));
+
 
         renderCollections();
         renderProductsByCategory();
@@ -1343,6 +1422,60 @@ if (hash.startsWith("#product-")) {
         "'": "&#39;"
       })[char]);
     }
+    function openMediaModal(src, type) {
+      const modal = document.getElementById("mediaModal");
+      const content = document.getElementById("mediaModalContent");
+
+      content.replaceChildren();
+
+      const media = document.createElement(
+        type === "video" ? "video" : "img"
+      );
+
+      media.src = src;
+
+      if (type === "video") {
+        media.controls = true;
+        media.autoplay = true;
+        media.playsInline = true;
+      } else {
+        media.alt = "Product image";
+      }
+
+      content.appendChild(media);
+      modal.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+
+function closeMediaModal() {
+  const modal = document.getElementById("mediaModal");
+  const content = document.getElementById("mediaModalContent");
+
+  const video = content.querySelector("video");
+  if (video) {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+  }
+
+  content.replaceChildren();
+  modal.classList.remove("is-open");
+  document.body.style.overflow = "";
+
+  if (lastFocusedElement?.isConnected) {
+    lastFocusedElement.focus();
+  }
+}
+
+document.getElementById("mediaModal").addEventListener("click", event => {
+  if (event.target.id === "mediaModal") {
+    closeMediaModal();
+  }
+});
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closeMediaModal();
+    });
 
     const collectionRail=document.getElementById("collection-grid"),reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
     let collectionTimer=0,collectionHover=false,collectionFocus=false,collectionTouch=false;
@@ -1352,6 +1485,6 @@ if (hash.startsWith("#product-")) {
     collectionRail.addEventListener("touchstart",()=>{collectionTouch=true;scheduleCollections()},{passive:true});for(const event of ["touchend","touchcancel"])collectionRail.addEventListener(event,()=>{collectionTouch=false;scheduleCollections()},{passive:true});
     collectionRail.addEventListener("scroll",scheduleCollections,{passive:true});document.addEventListener("visibilitychange",scheduleCollections);reducedMotion.addEventListener("change",scheduleCollections);
     initCatalogue().then(scheduleCollections);
-  </script>
+</script>
 </body>
 </html>
