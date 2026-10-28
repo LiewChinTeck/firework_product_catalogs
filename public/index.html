@@ -1422,30 +1422,33 @@ if (hash.startsWith("#product-")) {
         "'": "&#39;"
       })[char]);
     }
-    function openMediaModal(src, type) {
-      const modal = document.getElementById("mediaModal");
-      const content = document.getElementById("mediaModalContent");
+function openMediaModal(src, type) {
+  const modal = document.getElementById("mediaModal");
+  const content = document.getElementById("mediaModalContent");
 
-      content.replaceChildren();
+  content.replaceChildren();
 
-      const media = document.createElement(
-        type === "video" ? "video" : "img"
-      );
+  const media = document.createElement(
+    type === "video" ? "video" : "img"
+  );
 
-      media.src = src;
+  media.src = src;
 
-      if (type === "video") {
-        media.controls = true;
-        media.autoplay = true;
-        media.playsInline = true;
-      } else {
-        media.alt = "Product image";
-      }
+  if (type === "video") {
+    media.controls = true;
+    media.autoplay = true;
+    media.playsInline = true;
+  } else {
+    media.alt = "Product image";
+  }
 
-      content.appendChild(media);
-      modal.classList.add("is-open");
-      document.body.style.overflow = "hidden";
-    }
+  content.appendChild(media);
+  modal.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+
+  // Make the phone's Back button close the media
+  history.pushState({ mediaModalOpen: true }, "");
+}
 
 function closeMediaModal() {
   const modal = document.getElementById("mediaModal");
@@ -1461,11 +1464,15 @@ function closeMediaModal() {
   content.replaceChildren();
   modal.classList.remove("is-open");
   document.body.style.overflow = "";
-
-  if (lastFocusedElement?.isConnected) {
-    lastFocusedElement.focus();
-  }
 }
+
+window.addEventListener("popstate", function () {
+  const modal = document.getElementById("mediaModal");
+
+  if (modal.classList.contains("is-open")) {
+    closeMediaModal();
+  }
+});
 
 document.getElementById("mediaModal").addEventListener("click", event => {
   if (event.target.id === "mediaModal") {
