@@ -86,7 +86,7 @@ function mediaURL(value, folder = "") {
       ? `${folder}/${filename}`
       : filename;
 
-  return `${PUBLIC_URL}/2026/${combined.replace(/^2026\/+/, "")}`;
+  return `${PUBLIC_URL}/2026/media/${combined.replace(/^2026\/+/, "")}`;
 }
 
 function escapeHTML(value) {
@@ -101,7 +101,7 @@ function escapeHTML(value) {
 
 export default function handler(req, res) {
   try {
-    const csvPath = path.join(process.cwd(), "public", "2026", "products.csv");
+    const csvPath = path.join(process.cwd(), "public", "2026","data", "products.csv");
 
     if (!fs.existsSync(csvPath)) {
       return res.status(500).send("Products CSV not found.");
