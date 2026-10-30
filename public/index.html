@@ -243,7 +243,7 @@
     .product-art video {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
     }
 
@@ -418,7 +418,7 @@
     .video-frame img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
       background: #111521;
     }
@@ -536,7 +536,7 @@
     .collection-grid::-webkit-scrollbar{display:block;height:6px}
     .collection-grid::-webkit-scrollbar-thumb{background:var(--accent);border-radius:9px}
     .collection-card{position:relative;isolation:isolate;flex:0 0 86%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
-    .collection-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+    .collection-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:-2}
     .collection-card.has-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#00000008 15%,#000000b8 100%);z-index:-1;pointer-events:none}
     .collection-card.has-cover h3{text-shadow:0 1px 5px #0008}
     .collection-grid:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
@@ -545,15 +545,10 @@
     .collection-grid{scrollbar-width:none;-ms-overflow-style:none}
     .collection-grid::-webkit-scrollbar{display:none;width:0;height:0}
     .product-art{padding:0}
-    .product-art img,.product-art video{width:100%;height:100%;object-fit:cover}
+    .product-art img,.product-art video{width:100%;height:100%;object-fit:contain}
     
 .product-card {
   position: relative;
-}
-
-/* Might use next time */
-.share-product-link {
-  display: none;
 }
 
 .share-product-link {
@@ -687,123 +682,117 @@
     <div id="mediaModalContent" class="media-modal-content"></div>
   </div>
   <script>
-    /*
-      index.html is in the parent folder.
-      All CSV files and product media are inside ./2026/
-    */
 
-    const DATA_FILES = {
-      products: "2026/products.csv",
-      categories: "2026/categories.csv",
-      collections: "2026/collections.csv",
-      items: "2026/collection-items.csv",
-      productCategories: "2026/product-category.csv"
-    };
+const DATA_FILES = {
+  products: "2026/data/products.csv",
+  categories: "2026/data/categories.csv",
+  collections: "2026/data/collections.csv",
+  items: "2026/data/product-collection.csv",
+  productCategories: "2026/data/product-category.csv"
+};
 
-    const modal = document.getElementById("video-modal");
-    const modalTitle = document.getElementById("modal-title");
-    const videoFrame = document.getElementById("video-frame");
-    const closeButton = document.getElementById("modal-close");
+const modal = document.getElementById("video-modal");
+const modalTitle = document.getElementById("modal-title");
+const videoFrame = document.getElementById("video-frame");
+const closeButton = document.getElementById("modal-close");
 
-    let products = [];
-    let categories = [];
-    let collections = [];
-    let collectionItems = [];
-    let productCategories = [];
-    let lastFocusedElement = null;
-    let currentVideo = null;
+let products = [];
+let categories = [];
+let collections = [];
+let collectionItems = [];
+let productCategories = [];
+let lastFocusedElement = null;
+let currentVideo = null;
 
-    const colorNames = ["gold", "red", "green", "purple"];
+const colorNames = ["gold", "red", "green", "purple"];
 
-    /* ---------- CSV loading and parsing ---------- */
+/* ---------- CSV loading and parsing ---------- */
 
-    function parseCSV(text) {
-      const rows = [];
-      let row = [];
-      let field = "";
-      let inQuotes = false;
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
 
-      text = text.replace(/^\uFEFF/, "");
+  text = text.replace(/^\uFEFF/, "");
 
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
 
-        if (inQuotes) {
-          if (char === '"' && next === '"') {
-            field += '"';
-            i++;
-          } else if (char === '"') {
-            inQuotes = false;
-          } else {
-            field += char;
-          }
-        } else if (char === '"' && field.length === 0) {
-          inQuotes = true;
-        } else if (char === ",") {
-          row.push(field.trim());
-          field = "";
-        } else if (char === "\n") {
-          row.push(field.trim());
-          if (row.some(value => value !== "")) rows.push(row);
-          row = [];
-          field = "";
-        } else if (char !== "\r") {
-          field += char;
-        }
+    if (inQuotes) {
+      if (char === '"' && next === '"') {
+        field += '"';
+        i++;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        field += char;
       }
-
+    } else if (char === '"' && field.length === 0) {
+      inQuotes = true;
+    } else if (char === ",") {
+      row.push(field.trim());
+      field = "";
+    } else if (char === "\n") {
       row.push(field.trim());
       if (row.some(value => value !== "")) rows.push(row);
-
-      if (rows.length === 0) return [];
-
-      const headers = rows[0].map(header =>
-        header.trim().toLowerCase().replace(/[\s-]+/g, "_")
-      );
-
-      return rows.slice(1).map(values => {
-        const result = {};
-        headers.forEach((header, index) => {
-          result[header] = values[index] ?? "";
-        });
-        return result;
-      });
+      row = [];
+      field = "";
+    } else if (char !== "\r") {
+      field += char;
     }
+  }
 
-    async function loadCSV(path, fallback="") {
-      const response = await fetch(path, { cache: "no-store" });
+  row.push(field.trim());
+  if (row.some(value => value !== "")) rows.push(row);
 
-      if(response.status===404&&fallback)return loadCSV(fallback);
-      if (!response.ok) {
-        throw new Error(
-          `Could not load ${path} (HTTP ${response.status}).`
-        );
-      }
+  if (rows.length === 0) return [];
 
-      return parseCSV(await response.text());
+  const headers = rows[0].map(header =>
+    header.trim().toLowerCase().replace(/[\s-]+/g, "_")
+  );
+
+  return rows.slice(1).map(values => {
+    const result = {};
+    headers.forEach((header, index) => {
+      result[header] = values[index] ?? "";
+    });
+    return result;
+  });
+}
+
+async function loadCSV(path, fallback="") {
+  const response = await fetch(path, { cache: "no-store" });
+
+  if(response.status===404&&fallback)return loadCSV(fallback);
+  if (!response.ok) {
+    throw new Error(
+      `Could not load ${path} (HTTP ${response.status}).`
+    );
+  }
+
+  return parseCSV(await response.text());
+}
+
+function getField(row, aliases) {
+  for (const alias of aliases) {
+    const value = row[alias];
+    if (value !== undefined && value !== null && value !== "") {
+      return String(value).trim();
     }
+  }
+  return "";
+}
 
-    function getField(row, aliases) {
-      for (const alias of aliases) {
-        const value = row[alias];
-        if (value !== undefined && value !== null && value !== "") {
-          return String(value).trim();
-        }
-      }
-      return "";
-    }
+function normalize(value){return String(value??"").trim()}
+function uniqueMatch(rows,ref,keys){if(!normalize(ref))return null;const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref)));return matches.length===1?matches[0]:null}
+function reference(row,groups){for(const [kind,keys] of groups)for(const key of keys)if(Object.hasOwn(row,key))return {kind,value:normalize(row[key])};return {kind:"",value:""}}
+function resolveReference(rows,ref,groups){if(!ref.value)return null;for(const keys of groups[ref.kind]||[]){const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref.value)));if(matches.length)return matches.length===1?matches[0]:null}return null}
 
-    function normalize(value){return String(value??"").trim()}
-    function uniqueMatch(rows,ref,keys){if(!normalize(ref))return null;const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref)));return matches.length===1?matches[0]:null}
-    function reference(row,groups){for(const [kind,keys] of groups)for(const key of keys)if(Object.hasOwn(row,key))return {kind,value:normalize(row[key])};return {kind:"",value:""}}
-    function resolveReference(rows,ref,groups){if(!ref.value)return null;for(const keys of groups[ref.kind]||[]){const matches=rows.filter(row=>keys.some(key=>sameId(row[key],ref.value)));if(matches.length)return matches.length===1?matches[0]:null}return null}
-    
 function resolveCategory(row) {
-  const productId = getField(row, ["id", "product_id"]);
-
   const assignment = productCategories.find(item =>
-    sameId(item.product_id, productId)
+    sameId(item.product_id, row.id)
   );
 
   if (!assignment) return null;
@@ -813,441 +802,409 @@ function resolveCategory(row) {
   ) || null;
 }
 
-    function toBoolean(value) {
-      return ["true", "1", "yes", "y"].includes(
-        String(value ?? "").trim().toLowerCase()
-      );
-    }
+function mediaURL(path) {
+  if (!path) return "";
 
-    /*
-      CSV media paths are relative to the 2026 folder.
-      Example: 001_PM5050N/example.mp4
-      Result:   2026/001_PM5050N/example.mp4
-    */
+  const p = String(path).trim().replace(/\\/g, "/")
+    .replace(/^\.\/+|^\/+/, "");
 
-    function mediaURL(path) {
-      if (!path) return "";
+  if (!p) return "";
 
-      const cleaned = String(path)
-        .trim()
-        .replace(/\\/g, "/")
-        .replace(/^\.\/+/, "")
-        .replace(/^\/+/, "");
+  return /^(https?:|data:|blob:)/i.test(p) ||
+         p.startsWith("2026/media/")
+    ? p
+    : `2026/media/${p}`;
+}
 
-      if (!cleaned) return "";
+function productMediaURL(row, extension) {
+  const folder = `${String(row.id).padStart(3, "0")}_${row.code}`;
+  const name = String(row.name || "").trim();
 
-      if (/^(https?:|data:|blob:)/i.test(cleaned)) {
-        return cleaned;
-      }
+  if (!name || !row.id || !row.code) return "";
 
-      if (cleaned.startsWith("2026/")) {
-        return cleaned;
-      }
+  return mediaURL(`${folder}/${name}.${extension}`);
+}
 
-      return "2026/" + cleaned;
-    }
+function normalizeProducts(rows) {
+  return rows.map((row, index) => {
+    const code = row.code || `product-${index + 1}`;
+    const product = { ...row, code };
 
-    function productMediaURL(row,path){if(!path)return "";const folder=getField(row,["folder","folder_path","product_folder","directory","folder_name"]);const value=String(path).replace(/\\/g,"/");return mediaURL(folder&&!value.includes("/")?folder+"/"+value:value)}
+    const categoryRow = resolveCategory(product);
 
-    function getProductCode(row) {
-      return getField(row, [
-        "product_code", "code", "sku", "product_id",
-        "id", "item_code", "item_id"
-      ]);
-    }
+    return {
+      ...product,
+      name: row.name || code,
+      category: categoryRow ? categoryRow.name : "Unassigned",
+      categoryRow,
+      source: row,
+      image: productMediaURL(product, "jpg"),
+      video: productMediaURL(product, "mp4"),
+      color: colorNames[index % colorNames.length]
+    };
+  });
+}
 
-    function getProductName(row) {
-      return getField(row, [
-        "product_name", "name", "title", "product",
-        "item_name", "display_name"
-      ]);
-    }
+function getCategoryName(row) {
+  return getField(row, [
+    "category_name", "name", "title",
+    "category", "category_title", "category_id", "id"
+  ]);
+}
 
-    function getProductCategory(row) {
-      return getField(row, [
-        "category_name", "category", "category_title",
-        "category_id", "type", "product_category"
-      ]);
-    }
+function getCollectionName(row) {
+  return getField(row, [
+    "collection_name", "name", "title",
+    "collection", "collection_title", "collection_id", "id"
+  ]);
+}
 
-    function getImagePath(row) {
-      return getField(row, [
-        "image_path", "image", "image_url", "image_file",
-        "photo_path", "photo", "thumbnail", "thumbnail_path", "image_filename"
-      ]);
-    }
+function getCollectionId(row) {
+  return getField(row, [
+    "collection_id", "collection_code", "collection"
+  ]);
+}
 
-    function getVideoPath(row) {
-      return getField(row, [
-        "video_path", "video", "video_url", "video_file",
-        "media_path", "video_filename"
-      ]);
-    }
+function getItemProductId(row) {
+  return getField(row, [
+    "product_id", "product_code", "sku",
+    "item_id", "item_code", "code", "product"
+  ]);
+}
 
-    /* ---------- Normalize loaded data ---------- */
+function getItemCollectionId(row) {
+  return getField(row, [
+    "collection_id", "collection_code", "collection"
+  ]);
+}
 
-    function normalizeProducts(rows) {
-      return rows.map((row, index) => {
-        const code = getProductCode(row);
-        const name = getProductName(row);
-        const categoryRow = resolveCategory(row);
+function sameId(a, b) {
+  return !!normalize(a)&&!!normalize(b)&&normalize(a)===normalize(b);
+}
 
-        return {
-          ...row,
-          id: getField(row, ["id", "product_id", "product id"]),
-          code: code || `product-${index + 1}`,
-          name: name || code || `Product ${index + 1}`,
-          category: categoryRow?getCategoryName(categoryRow):"Unassigned",
-          categoryRow,source:row,
-          image: productMediaURL(row,getImagePath(row)||(getVideoPath(row)?getVideoPath(row).replace(/\.mp4$/i,".jpg"):"")),
-          video: productMediaURL(row,getVideoPath(row)),
-          color: colorNames[index % colorNames.length]
-        };
-      });
-    }
+/* ---------- Render product cards ---------- */
 
-    function getCategoryName(row) {
-      return getField(row, [
-        "category_name", "name", "title",
-        "category", "category_title", "category_id", "id"
-      ]);
-    }
+function makeProductArt(product) {
+  const art = document.createElement("div");
+  art.className = "product-art";
 
-    function getCollectionName(row) {
-      return getField(row, [
-        "collection_name", "name", "title",
-        "collection", "collection_title", "collection_id", "id"
-      ]);
-    }
+  if (product.image) {
+    const image = document.createElement("img");
+    image.src = product.image;
+    image.alt = product.name;
+    image.loading = "lazy";
 
-    function getCollectionId(row) {
-      return getField(row, [
-        "collection_id", "collection_code", "collection"
-      ]);
-    }
+    image.addEventListener("error", () => {
+      image.remove();
+      art.appendChild(makeFallbackBox(product));
+    }, { once: true });
 
-    function getItemProductId(row) {
-      return getField(row, [
-        "product_id", "product_code", "sku",
-        "item_id", "item_code", "code", "product"
-      ]);
-    }
+    art.appendChild(image);
+  } else {
+    art.appendChild(makeFallbackBox(product));
+  }
 
-    function getItemCollectionId(row) {
-      return getField(row, [
-        "collection_id", "collection_code", "collection"
-      ]);
-    }
+  return art;
+}
 
-    function sameId(a, b) {
-      return !!normalize(a)&&!!normalize(b)&&normalize(a)===normalize(b);
-    }
+function makeFallbackBox(product) {
+  const box = document.createElement("div");
+  box.className = `firework-box ${product.color}`;
 
-    /* ---------- Render product cards ---------- */
+  const label = document.createElement("strong");
+  label.textContent = product.name;
 
-    function makeProductArt(product) {
-      const art = document.createElement("div");
-      art.className = "product-art";
-
-      if (product.image) {
-        const image = document.createElement("img");
-        image.src = product.image;
-        image.alt = product.name;
-        image.loading = "lazy";
-
-        image.addEventListener("error", () => {
-          image.remove();
-          art.appendChild(makeFallbackBox(product));
-        }, { once: true });
-
-        art.appendChild(image);
-      } else {
-        art.appendChild(makeFallbackBox(product));
-      }
-
-      return art;
-    }
-
-    function makeFallbackBox(product) {
-      const box = document.createElement("div");
-      box.className = `firework-box ${product.color}`;
-
-      const label = document.createElement("strong");
-      label.textContent = product.name;
-
-      box.appendChild(label);
-      return box;
-    }
+  box.appendChild(label);
+  return box;
+}
 
 
 function renderProductCard(product) {
-  const card = document.createElement("button");
-  card.type = "button";
-  card.className = "product-card";
-  card.dataset.productCode = product.code;
-  card.dataset.productId = product.id;
-  card.setAttribute("aria-label", `View ${product.name}`);
+const card = document.createElement("button");
+card.type = "button";
+card.className = "product-card";
+card.dataset.productCode = product.code;
+card.dataset.productId = product.id;
+card.setAttribute("aria-label", `View ${product.name}`);
 
-  card.appendChild(makeProductArt(product));
+card.appendChild(makeProductArt(product));
 
-  const shareButton = document.createElement("button");
-  shareButton.type = "button";
-  shareButton.className = "share-product-link";
-  shareButton.title = "Share product";
-  shareButton.setAttribute("aria-label", `Share ${product.name}`);
+const shareButton = document.createElement("button");
+shareButton.type = "button";
+shareButton.className = "share-product-link";
+shareButton.title = "Share product";
+shareButton.setAttribute("aria-label", `Share ${product.name}`);
 
 const shareIcon = `
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="18" height="18"
-     viewBox="0 0 48 48"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="3"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-  <path d="M6 42 C6 25 16 14 29 14 L29 7 L44 18 L29 32 L29 24 C20 24 12 31 6 42 Z"/>
+  width="18" height="18"
+  viewBox="0 0 48 48"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="3"
+  stroke-linecap="round"
+  stroke-linejoin="round">
+<path d="M6 42 C6 25 16 14 29 14 L29 7 L44 18 L29 32 L29 24 C20 24 12 31 6 42 Z"/>
 </svg>
 `;
 
-  shareButton.innerHTML = shareIcon;
+shareButton.innerHTML = shareIcon;
 
-  shareButton.addEventListener("click", async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+shareButton.addEventListener("click", async (event) => {
+event.preventDefault();
+event.stopPropagation();
 
-    const url = new URL(
-      `/share/${encodeURIComponent(product.id)}`,
-      window.location.origin
-    ).href;
+const url = new URL(
+  `/share/${encodeURIComponent(product.id)}`,
+  window.location.origin
+).href;
 
-    const shareData = {
-      title: product.name,
-      text: `Check out ${product.name}!`,
-      url: url
-    };
+const shareData = {
+  title: product.name,
+  text: `Check out ${product.name}!`,
+  url: url
+};
 
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback for browsers without native sharing
-        await navigator.clipboard.writeText(url);
+try {
+  if (navigator.share) {
+    await navigator.share(shareData);
+  } else {
+    // Fallback for browsers without native sharing
+    await navigator.clipboard.writeText(url);
 
-        shareButton.innerHTML = "✓";
-        shareButton.title = "Link copied";
+    shareButton.innerHTML = "✓";
+    shareButton.title = "Link copied";
 
-        setTimeout(() => {
-          shareButton.innerHTML = shareIcon;
-          shareButton.title = "Share product";
-        }, 1500);
-      }
-    } catch (error) {
-      if (error.name !== "AbortError") {
-        console.error("Unable to share product:", error);
-      }
+    setTimeout(() => {
+      shareButton.innerHTML = shareIcon;
+      shareButton.title = "Share product";
+    }, 1500);
+  }
+} catch (error) {
+  if (error.name !== "AbortError") {
+    console.error("Unable to share product:", error);
+  }
+}
+});
+
+card.appendChild(shareButton);
+
+  const info = document.createElement("div");
+  info.className = "product-info";
+
+  const name = document.createElement("div");
+  name.className = "product-name";
+  name.textContent = product.name;
+
+  info.append(name);
+  card.appendChild(info);
+
+  card.addEventListener("click", () => openProduct(product));
+
+  return card;
+}
+
+function renderProductsByCategory() {
+  const nav = document.getElementById("category-nav");
+  const sections = document.getElementById("catalogue-sections");
+
+  nav.replaceChildren();
+  sections.replaceChildren();
+
+  const categoryGroups = categories
+    .map(row => ({ row, name: row.name?.trim() || "" }))
+    .filter(group => group.name);  
+  if(products.some(product=>!product.categoryRow))categoryGroups.push({row:null,name:"Unassigned"});
+  const categoryNames=categoryGroups.map(group=>group.name);
+
+  if (!categoryNames.length) {
+    sections.innerHTML =
+      '<div class="empty-message">No product categories were found.</div>';
+    return;
+  }
+
+  categoryNames.forEach((category, index) => {
+    const sectionId = `category-${index + 1}`;
+
+    const link = document.createElement("a");
+    link.href = `#${sectionId}`;
+    link.textContent = category;
+    link.addEventListener("click",event=>{if(document.getElementById("selected-collection")){event.preventDefault();renderProductsByCategory();document.getElementById(sectionId)?.scrollIntoView({behavior:"smooth"})}});
+
+    if (index === 0) link.classList.add("active");
+    nav.appendChild(link);
+
+    const section = document.createElement("section");
+    section.id = sectionId;
+
+    const heading = document.createElement("div");
+    heading.className = "section-heading";
+
+    const title = document.createElement("h2");
+    title.textContent = category;
+
+    const count = document.createElement("div");
+    count.className = "count";
+
+    const items = products.filter(product =>
+      product.categoryRow===categoryGroups[index].row
+    );
+
+    count.textContent =
+      `${items.length} ${items.length === 1 ? "product" : "products"}`;
+
+    heading.append(title, count);
+
+    const grid = document.createElement("div");
+    grid.className = "product-grid";
+
+    if (items.length) {
+      items.forEach(product => grid.appendChild(renderProductCard(product)));
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty-message";
+      empty.textContent = "No products in this category yet.";
+      grid.appendChild(empty);
     }
+
+    section.append(heading, grid);
+    sections.appendChild(section);
   });
 
-  card.appendChild(shareButton);
+  setupCategoryObserver();
+}
 
-      const info = document.createElement("div");
-      info.className = "product-info";
-      info.textContent = product.code;
+/* ---------- Render special collection cards ---------- */
 
-      const name = document.createElement("div");
-      name.className = "product-name";
-      name.textContent = product.name;
+function getCollectionProducts(collection){
+  const linked=new Set();
+  for(const item of collectionItems){
+    const collectionRef=reference(item,[["id",["collection_id"]],["code",["collection_code"]],["name",["collection_name"]],["generic",["collection"]]]);
+    const target=resolveReference(collections,collectionRef,{id:[["collection_id","id"]],code:[["collection_code","code","slug"]],name:[["collection_name","name","title"]],generic:[["collection_id","id","collection_code","code","slug"],["collection_name","name","title"]]});
+    if(target!==collection)continue;
+    const productRef=reference(item,[["code",["product_code","sku","item_code","code"]],["id",["product_id","item_id"]],["name",["product_name"]],["generic",["product"]]]);
+    const sources=products.map(product=>product.source);
+    const source=resolveReference(sources,productRef,{code:[["product_code","code","sku","item_code"]],id:[["product_id","id","item_id"]],name:[["product_name","name","title","product","item_name","display_name"]],generic:[["product_code","code","sku","item_code","product_id","id","item_id"]]});
+    const product=products.find(product=>product.source===source);if(product)linked.add(product);
+  }
+  return products.filter(product=>linked.has(product));
+}
 
-      info.append(name);
-      card.appendChild(info);
+function renderCollections() {
+  const grid = document.getElementById("collection-grid");
+  grid.replaceChildren();
 
-      card.addEventListener("click", () => openProduct(product));
+  if (!collections.length) {
+    grid.innerHTML =
+      '<div class="empty-message">No collections were found in collections.csv.</div>';
+    return;
+  }
 
-      return card;
+  collections.forEach((collection, index) => {
+    const name = collection.name?.trim() || `Collection ${index + 1}`;
+    const assignedProducts = getCollectionProducts(collection);
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = `collection-card${index % 2 ? " second" : ""}`;
+    card.setAttribute("aria-label", `View ${name}`);
+
+
+    const title = document.createElement("h3");
+    title.textContent = name;
+
+    const coverPath = collection.image_path?.trim() || "";
+
+    if (coverPath) {
+      const cover = document.createElement("img");
+      cover.className = "collection-cover";
+      cover.src = `2026/${coverPath.replace(/^\/+/, "")}`;
+      cover.alt = "";
+      cover.loading = "lazy";
+      cover.decoding = "async";
+
+      cover.addEventListener("error", () => {
+        cover.remove();
+        card.classList.remove("has-cover");
+        console.error("Collection cover failed to load:", cover.src);
+      }, { once: true });
+
+      card.classList.add("has-cover");
+      card.appendChild(cover);
     }
+    card.append(title);
 
-    function renderProductsByCategory() {
-      const nav = document.getElementById("category-nav");
-      const sections = document.getElementById("catalogue-sections");
+    card.addEventListener("click", () => {
+      showCollection(collection, assignedProducts);
+    });
 
-      nav.replaceChildren();
-      sections.replaceChildren();
+    grid.appendChild(card);
+  });
+}
 
-      const categoryGroups=categories.map(row=>({row,name:getCategoryName(row)})).filter(group=>group.name);
-      if(products.some(product=>!product.categoryRow))categoryGroups.push({row:null,name:"Unassigned"});
-      const categoryNames=categoryGroups.map(group=>group.name);
+function showCollection(collection, items) {
+  if(categoryObserver)categoryObserver.disconnect();
+  document.querySelectorAll("#category-nav a").forEach(link=>link.classList.remove("active"));
+  const name = collection.name?.trim() || "Collection";
+  const sections = document.getElementById("catalogue-sections");
 
-      if (!categoryNames.length) {
-        sections.innerHTML =
-          '<div class="empty-message">No product categories were found.</div>';
-        return;
-      }
+  sections.replaceChildren();
 
-      categoryNames.forEach((category, index) => {
-        const sectionId = `category-${index + 1}`;
+  const section = document.createElement("section");
+  section.id = "selected-collection";
 
-        const link = document.createElement("a");
-        link.href = `#${sectionId}`;
-        link.textContent = category;
-        link.addEventListener("click",event=>{if(document.getElementById("selected-collection")){event.preventDefault();renderProductsByCategory();document.getElementById(sectionId)?.scrollIntoView({behavior:"smooth"})}});
+  const heading = document.createElement("div");
+  heading.className = "section-heading";
 
-        if (index === 0) link.classList.add("active");
-        nav.appendChild(link);
+  const title = document.createElement("h2");
+  title.textContent = name;
 
-        const section = document.createElement("section");
-        section.id = sectionId;
+  const count = document.createElement("div");
+  count.className = "count";
+  count.textContent =
+    `${items.length} ${items.length === 1 ? "product" : "products"}`;
 
-        const heading = document.createElement("div");
-        heading.className = "section-heading";
+  heading.append(title, count);
 
-        const title = document.createElement("h2");
-        title.textContent = category;
+  const grid = document.createElement("div");
+  grid.className = "product-grid";
 
-        const count = document.createElement("div");
-        count.className = "count";
+  if (items.length) {
+    items.forEach(product => grid.appendChild(renderProductCard(product)));
+  } else {
+    const empty = document.createElement("div");
+    empty.className = "empty-message";
+    empty.textContent =
+      "No products are linked to this collection. Check product-collection.csv.";
+    grid.appendChild(empty);
+  }
 
-        const items = products.filter(product =>
-          product.categoryRow===categoryGroups[index].row
-        );
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "category-nav a";
+  back.style.cssText =
+    "margin-top:24px;padding:10px 18px;border:1px solid var(--border);" +
+    "border-radius:999px;background:white;cursor:pointer;font-weight:700;";
+  back.textContent = "← Back to all products";
+  back.addEventListener("click", () => {
+    renderProductsByCategory();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
 
-        count.textContent =
-          `${items.length} ${items.length === 1 ? "product" : "products"}`;
+  section.append(heading, grid, back);
+  sections.appendChild(section);
 
-        heading.append(title, count);
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
-        const grid = document.createElement("div");
-        grid.className = "product-grid";
+/* ---------- Video/image popup ---------- */
 
-        if (items.length) {
-          items.forEach(product => grid.appendChild(renderProductCard(product)));
-        } else {
-          const empty = document.createElement("div");
-          empty.className = "empty-message";
-          empty.textContent = "No products in this category yet.";
-          grid.appendChild(empty);
-        }
-
-        section.append(heading, grid);
-        sections.appendChild(section);
-      });
-
-      setupCategoryObserver();
-    }
-
-    /* ---------- Render special collection cards ---------- */
-
-    function getCollectionProducts(collection){
-      const linked=new Set();
-      for(const item of collectionItems){
-        const collectionRef=reference(item,[["id",["collection_id"]],["code",["collection_code"]],["name",["collection_name"]],["generic",["collection"]]]);
-        const target=resolveReference(collections,collectionRef,{id:[["collection_id","id"]],code:[["collection_code","code","slug"]],name:[["collection_name","name","title"]],generic:[["collection_id","id","collection_code","code","slug"],["collection_name","name","title"]]});
-        if(target!==collection)continue;
-        const productRef=reference(item,[["code",["product_code","sku","item_code","code"]],["id",["product_id","item_id"]],["name",["product_name"]],["generic",["product"]]]);
-        const sources=products.map(product=>product.source);
-        const source=resolveReference(sources,productRef,{code:[["product_code","code","sku","item_code"]],id:[["product_id","id","item_id"]],name:[["product_name","name","title","product","item_name","display_name"]],generic:[["product_code","code","sku","item_code","product_id","id","item_id"]]});
-        const product=products.find(product=>product.source===source);if(product)linked.add(product);
-      }
-      return products.filter(product=>linked.has(product));
-    }
-
-    function renderCollections() {
-      const grid = document.getElementById("collection-grid");
-      grid.replaceChildren();
-
-      if (!collections.length) {
-        grid.innerHTML =
-          '<div class="empty-message">No collections were found in collections.csv.</div>';
-        return;
-      }
-
-      collections.forEach((collection, index) => {
-        const name = getCollectionName(collection) || `Collection ${index + 1}`;
-        const assignedProducts = getCollectionProducts(collection);
-
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = `collection-card${index % 2 ? " second" : ""}`;
-        card.setAttribute("aria-label", `View ${name}`);
-
-
-        const title = document.createElement("h3");
-        title.textContent = name;
-
-        const coverPath=getField(collection,["image_path","cover_image","cover_path","image","image_url","cover"]);
-        if(coverPath){const cover=document.createElement("img");cover.className="collection-cover";cover.src=mediaURL(coverPath);cover.alt="";cover.loading="lazy";cover.decoding="async";cover.addEventListener("error",()=>{cover.remove();card.classList.remove("has-cover")},{once:true});card.classList.add("has-cover");card.appendChild(cover)}
-        card.append(title);
-
-        card.addEventListener("click", () => {
-          showCollection(collection, assignedProducts);
-        });
-
-        grid.appendChild(card);
-      });
-    }
-
-    function showCollection(collection, items) {
-      if(categoryObserver)categoryObserver.disconnect();
-      document.querySelectorAll("#category-nav a").forEach(link=>link.classList.remove("active"));
-      const name = getCollectionName(collection) || "Collection";
-      const sections = document.getElementById("catalogue-sections");
-
-      sections.replaceChildren();
-
-      const section = document.createElement("section");
-      section.id = "selected-collection";
-
-      const heading = document.createElement("div");
-      heading.className = "section-heading";
-
-      const title = document.createElement("h2");
-      title.textContent = name;
-
-      const count = document.createElement("div");
-      count.className = "count";
-      count.textContent =
-        `${items.length} ${items.length === 1 ? "product" : "products"}`;
-
-      heading.append(title, count);
-
-      const grid = document.createElement("div");
-      grid.className = "product-grid";
-
-      if (items.length) {
-        items.forEach(product => grid.appendChild(renderProductCard(product)));
-      } else {
-        const empty = document.createElement("div");
-        empty.className = "empty-message";
-        empty.textContent =
-          "No products are linked to this collection. Check collection-items.csv.";
-        grid.appendChild(empty);
-      }
-
-      const back = document.createElement("button");
-      back.type = "button";
-      back.className = "category-nav a";
-      back.style.cssText =
-        "margin-top:24px;padding:10px 18px;border:1px solid var(--border);" +
-        "border-radius:999px;background:white;cursor:pointer;font-weight:700;";
-      back.textContent = "← Back to all products";
-      back.addEventListener("click", () => {
-        renderProductsByCategory();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-
-      section.append(heading, grid, back);
-      sections.appendChild(section);
-
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    /* ---------- Video/image popup ---------- */
-
-    function showUnavailable(message) {
-      const text = document.createElement("div");
-      text.className = "video-unavailable";
-      text.textContent = message;
-      videoFrame.replaceChildren(text);
-    }
+function showUnavailable(message) {
+  const text = document.createElement("div");
+  text.className = "video-unavailable";
+  text.textContent = message;
+  videoFrame.replaceChildren(text);
+}
 
 
 function openProduct(product) {
@@ -1260,252 +1217,253 @@ function openProduct(product) {
   }
 }
 
-    function showProductImage(product) {
-      currentVideo = null;
+function showProductImage(product) {
+  currentVideo = null;
 
-      const image = document.createElement("img");
-      image.src = product.image;
-      image.alt = product.name;
+  const image = document.createElement("img");
+  image.src = product.image;
+  image.alt = product.name;
 
-      image.addEventListener("error", () => {
-        showUnavailable("The product image could not be loaded.");
-      }, { once: true });
+  image.addEventListener("error", () => {
+    showUnavailable("The product image could not be loaded.");
+  }, { once: true });
 
-      videoFrame.replaceChildren(image);
-    }
+  videoFrame.replaceChildren(image);
+}
 
-    function closeProduct() {
-      if (!modal.classList.contains("is-open")) return;
+function closeProduct() {
+  if (!modal.classList.contains("is-open")) return;
 
-      if (currentVideo) {
-        currentVideo.pause();
-        currentVideo.removeAttribute("src");
-        currentVideo.load();
-        currentVideo = null;
-      }
+  if (currentVideo) {
+    currentVideo.pause();
+    currentVideo.removeAttribute("src");
+    currentVideo.load();
+    currentVideo = null;
+  }
 
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("modal-open");
-      videoFrame.replaceChildren();
-      scheduleCollections();
+  modal.classList.remove("is-open");
+  modal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  videoFrame.replaceChildren();
+  scheduleCollections();
 
-      if (lastFocusedElement && document.contains(lastFocusedElement)) {
-        lastFocusedElement.focus();
-      }
-    }
+  if (lastFocusedElement && document.contains(lastFocusedElement)) {
+    lastFocusedElement.focus();
+  }
+}
 
-    closeButton.addEventListener("click", closeProduct);
+closeButton.addEventListener("click", closeProduct);
 
-    modal.addEventListener("click", event => {
-      if (event.target === modal) closeProduct();
-    });
+modal.addEventListener("click", event => {
+  if (event.target === modal) closeProduct();
+});
 
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") closeProduct();
-    });
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeProduct();
+});
 
-    /* ---------- Highlight active category ---------- */
+/* ---------- Highlight active category ---------- */
 
-    let categoryObserver;
+let categoryObserver;
 
-    function setupCategoryObserver() {
-      if (categoryObserver) categoryObserver.disconnect();
+function setupCategoryObserver() {
+  if (categoryObserver) categoryObserver.disconnect();
 
-      const links = document.querySelectorAll("#category-nav a");
-      const sections = document.querySelectorAll(
-        "#catalogue-sections section[id^='category-']"
-      );
+  const links = document.querySelectorAll("#category-nav a");
+  const sections = document.querySelectorAll(
+    "#catalogue-sections section[id^='category-']"
+  );
 
-      if (!("IntersectionObserver" in window)) return;
+  if (!("IntersectionObserver" in window)) return;
 
-      categoryObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
+  categoryObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
 
-          links.forEach(link => {
-            link.classList.toggle(
-              "active",
-              link.getAttribute("href") === `#${entry.target.id}`
-            );
-          });
-        });
-      }, {
-        rootMargin: "-20% 0px -60% 0px"
+      links.forEach(link => {
+        link.classList.toggle(
+          "active",
+          link.getAttribute("href") === `#${entry.target.id}`
+        );
       });
+    });
+  }, {
+    rootMargin: "-20% 0px -60% 0px"
+  });
 
-      sections.forEach(section => categoryObserver.observe(section));
-    }
+  sections.forEach(section => categoryObserver.observe(section));
+}
 
-    /* ---------- Start catalogue ---------- */
+/* ---------- Start catalogue ---------- */
 
-    async function initCatalogue() {
-      try {
-        const results = await Promise.all([
-          loadCSV(DATA_FILES.products),
-          loadCSV(DATA_FILES.categories),
-          loadCSV(DATA_FILES.collections),
-          loadCSV(DATA_FILES.items),
-          loadCSV(DATA_FILES.productCategories)
-        ]);
+async function initCatalogue() {
+  try {
+    const results = await Promise.all([
+      loadCSV(DATA_FILES.products),
+      loadCSV(DATA_FILES.categories),
+      loadCSV(DATA_FILES.collections),
+      loadCSV(DATA_FILES.items),
+      loadCSV(DATA_FILES.productCategories)
+    ]);
 
-        categories = results[1];
-        productCategories = results[4];
-        products = normalizeProducts(results[0]);
-        collections = results[2];
-        collectionItems = results[3];
+    categories = results[1];
+    productCategories = results[4];
+    products = normalizeProducts(results[0]);
+    collections = results[2];
+    collectionItems = results[3];
 
-	categories.sort((a, b) => Number(a.sort_order) - Number(b.sort_order));
+    categories.sort((a, b) => Number(a.sort_order) - Number(b.sort_order));
 
 
-        renderCollections();
-        renderProductsByCategory();
+    renderCollections();
+    renderProductsByCategory();
 
-        console.info("Catalogue loaded:", {
-          products: products.length,
-          categories: categories.length,
-          collections: collections.length,
-          collectionAssignments: collectionItems.length
-        });
-      } catch (error) {
-        console.error("Catalogue loading failed:", error);
+    console.info("Catalogue loaded:", {
+      products: products.length,
+      categories: categories.length,
+      collections: collections.length,
+      collectionAssignments: collectionItems.length
+    });
+  } catch (error) {
+    console.error("Catalogue loading failed:", error);
 
-        document.getElementById("catalogue-sections").innerHTML = `
-          <div class="error-message">
-            <strong>Could not load the catalogue.</strong>
-            <p>${escapeHTML(error.message)}</p>
-            <p>
-              Check that index.html is beside the 2026 folder and that
-              all four CSV files exist inside 2026.
-            </p>
-            <p>
-              Open the site through a local web server, not by double-clicking
-              index.html.
-            </p>
-          </div>
-        `;
+    document.getElementById("catalogue-sections").innerHTML = `
+      <div class="error-message">
+        <strong>Could not load the catalogue.</strong>
+        <p>${escapeHTML(error.message)}</p>
+        <p>
+          Check that index.html is beside the 2026 folder and that
+          all four CSV files exist inside 2026.
+        </p>
+        <p>
+          Open the site through a local web server, not by double-clicking
+          index.html.
+        </p>
+      </div>
+    `;
 
-        document.getElementById("collection-grid").innerHTML = `
-          <div class="error-message">
-            Collections could not be loaded. Check the browser console for details.
-          </div>
-        `;
-      }
-      
+    document.getElementById("collection-grid").innerHTML = `
+      <div class="error-message">
+        Collections could not be loaded. Check the browser console for details.
+      </div>
+    `;
+  }
+  
 const hash = window.location.hash;
 
 if (hash.startsWith("#product-")) {
-  const sharedId = decodeURIComponent(
-    hash.slice("#product-".length)
+const sharedId = decodeURIComponent(
+hash.slice("#product-".length)
+);
+
+const product = products.find(
+p => String(p.id).trim() === sharedId.trim()
+);
+
+if (product) {
+setTimeout(() => {
+  const card = document.querySelector(
+    `[data-product-id="${CSS.escape(product.id)}"]`
   );
 
-  const product = products.find(
-    p => String(p.id).trim() === sharedId.trim()
-  );
+  if (!card) return;
 
-  if (product) {
-    setTimeout(() => {
-      const card = document.querySelector(
-        `[data-product-id="${CSS.escape(product.id)}"]`
-      );
+  card.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
 
-      if (!card) return;
+  card.classList.add("share-highlight");
 
-      card.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-
-      card.classList.add("share-highlight");
-
-      setTimeout(() => {
-        card.classList.remove("share-highlight");
-      }, 3000);
-    }, 300);
-  }
+  setTimeout(() => {
+    card.classList.remove("share-highlight");
+  }, 3000);
+}, 300);
+}
 }
 
-    }
+}
 
-    function escapeHTML(value) {
-      return String(value).replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[char]);
-    }
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 function openMediaModal(src, type) {
-  const modal = document.getElementById("mediaModal");
-  const content = document.getElementById("mediaModalContent");
+const modal = document.getElementById("mediaModal");
+const content = document.getElementById("mediaModalContent");
 
-  content.replaceChildren();
+content.replaceChildren();
 
-  const media = document.createElement(
-    type === "video" ? "video" : "img"
-  );
+const media = document.createElement(
+type === "video" ? "video" : "img"
+);
 
-  media.src = src;
+media.src = src;
 
-  if (type === "video") {
-    media.controls = true;
-    media.autoplay = true;
-    media.playsInline = true;
-  } else {
-    media.alt = "Product image";
-  }
+if (type === "video") {
+media.controls = true;
+media.autoplay = true;
+media.playsInline = true;
+} else {
+media.alt = "Product image";
+}
 
-  content.appendChild(media);
-  modal.classList.add("is-open");
-  document.body.style.overflow = "hidden";
+content.appendChild(media);
+modal.classList.add("is-open");
+document.body.style.overflow = "hidden";
 
-  // Make the phone's Back button close the media
-  history.pushState({ mediaModalOpen: true }, "");
+// Make the phone's Back button close the media
+history.pushState({ mediaModalOpen: true }, "");
 }
 
 function closeMediaModal() {
-  const modal = document.getElementById("mediaModal");
-  const content = document.getElementById("mediaModalContent");
+const modal = document.getElementById("mediaModal");
+const content = document.getElementById("mediaModalContent");
 
-  const video = content.querySelector("video");
-  if (video) {
-    video.pause();
-    video.removeAttribute("src");
-    video.load();
-  }
+const video = content.querySelector("video");
+if (video) {
+video.pause();
+video.removeAttribute("src");
+video.load();
+}
 
-  content.replaceChildren();
-  modal.classList.remove("is-open");
-  document.body.style.overflow = "";
+content.replaceChildren();
+modal.classList.remove("is-open");
+document.body.style.overflow = "";
 }
 
 window.addEventListener("popstate", function () {
-  const modal = document.getElementById("mediaModal");
+const modal = document.getElementById("mediaModal");
 
-  if (modal.classList.contains("is-open")) {
-    closeMediaModal();
-  }
+if (modal.classList.contains("is-open")) {
+closeMediaModal();
+}
 });
 
 document.getElementById("mediaModal").addEventListener("click", event => {
-  if (event.target.id === "mediaModal") {
-    closeMediaModal();
-  }
+if (event.target.id === "mediaModal") {
+closeMediaModal();
+}
 });
 
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") closeMediaModal();
-    });
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") closeMediaModal();
+});
 
-    const collectionRail=document.getElementById("collection-grid"),reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
-    let collectionTimer=0,collectionHover=false,collectionFocus=false,collectionTouch=false;
-    function scheduleCollections(){clearTimeout(collectionTimer);if(reducedMotion.matches||document.hidden||collectionHover||collectionFocus||collectionTouch||modal.classList.contains("is-open"))return;collectionTimer=setTimeout(()=>{const cards=[...collectionRail.querySelectorAll(".collection-card")],max=collectionRail.scrollWidth-collectionRail.clientWidth;if(cards.length<2||max<=1)return;const origin=collectionRail.getBoundingClientRect().left+parseFloat(getComputedStyle(collectionRail).paddingLeft||0),next=cards.find(card=>card.getBoundingClientRect().left>origin+4);collectionRail.scrollTo({left:collectionRail.scrollLeft>=max-4?0:next?Math.min(max,collectionRail.scrollLeft+next.getBoundingClientRect().left-origin):0,behavior:"smooth"});scheduleCollections()},3500)}
-    collectionRail.addEventListener("mouseenter",()=>{collectionHover=true;scheduleCollections()});collectionRail.addEventListener("mouseleave",()=>{collectionHover=false;scheduleCollections()});
-    collectionRail.addEventListener("focusin",()=>{collectionFocus=true;scheduleCollections()});collectionRail.addEventListener("focusout",event=>{collectionFocus=collectionRail.contains(event.relatedTarget);scheduleCollections()});
-    collectionRail.addEventListener("touchstart",()=>{collectionTouch=true;scheduleCollections()},{passive:true});for(const event of ["touchend","touchcancel"])collectionRail.addEventListener(event,()=>{collectionTouch=false;scheduleCollections()},{passive:true});
-    collectionRail.addEventListener("scroll",scheduleCollections,{passive:true});document.addEventListener("visibilitychange",scheduleCollections);reducedMotion.addEventListener("change",scheduleCollections);
-    initCatalogue().then(scheduleCollections);
-</script>
+const collectionRail=document.getElementById("collection-grid"),reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+let collectionTimer=0,collectionHover=false,collectionFocus=false,collectionTouch=false;
+function scheduleCollections(){clearTimeout(collectionTimer);if(reducedMotion.matches||document.hidden||collectionHover||collectionFocus||collectionTouch||modal.classList.contains("is-open"))return;collectionTimer=setTimeout(()=>{const cards=[...collectionRail.querySelectorAll(".collection-card")],max=collectionRail.scrollWidth-collectionRail.clientWidth;if(cards.length<2||max<=1)return;const origin=collectionRail.getBoundingClientRect().left+parseFloat(getComputedStyle(collectionRail).paddingLeft||0),next=cards.find(card=>card.getBoundingClientRect().left>origin+4);collectionRail.scrollTo({left:collectionRail.scrollLeft>=max-4?0:next?Math.min(max,collectionRail.scrollLeft+next.getBoundingClientRect().left-origin):0,behavior:"smooth"});scheduleCollections()},3500)}
+collectionRail.addEventListener("mouseenter",()=>{collectionHover=true;scheduleCollections()});collectionRail.addEventListener("mouseleave",()=>{collectionHover=false;scheduleCollections()});
+collectionRail.addEventListener("focusin",()=>{collectionFocus=true;scheduleCollections()});collectionRail.addEventListener("focusout",event=>{collectionFocus=collectionRail.contains(event.relatedTarget);scheduleCollections()});
+collectionRail.addEventListener("touchstart",()=>{collectionTouch=true;scheduleCollections()},{passive:true});for(const event of ["touchend","touchcancel"])collectionRail.addEventListener(event,()=>{collectionTouch=false;scheduleCollections()},{passive:true});
+collectionRail.addEventListener("scroll",scheduleCollections,{passive:true});document.addEventListener("visibilitychange",scheduleCollections);reducedMotion.addEventListener("change",scheduleCollections);
+initCatalogue().then(scheduleCollections);
+
+  </script>
 </body>
 </html>
