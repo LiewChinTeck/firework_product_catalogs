@@ -1,0 +1,214 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 713 1024">
+
+<defs>
+    <radialGradient id="bodyRed"
+    cx="51%" cy="48%" r="65%">
+        <stop offset="0%" stop-color="#ff777b"/>
+        <stop offset="65%" stop-color="#f22e50"/>
+        <stop offset="100%" stop-color="#c9002c"/>
+    </radialGradient>
+
+    <linearGradient id="gold"
+    x1="0" y1="0" x2="1" y2="0">
+        <stop stop-color="#9b641c"/>
+        <stop offset=".16" stop-color="#f7d77b"/>
+        <stop offset=".35" stop-color="#fff4c4"/>
+        <stop offset=".55" stop-color="#e5b64e"/>
+        <stop offset=".78" stop-color="#fff1b1"/>
+        <stop offset="1" stop-color="#98601b"/>
+    </linearGradient>
+
+    <radialGradient id="bead"
+    cx="35%" cy="28%" r="70%">
+        <stop stop-color="#fffde0"/>
+        <stop offset=".7" stop-color="#ffe9a0"/>
+        <stop offset="1" stop-color="#e5b64e"/>
+    </radialGradient>
+</defs>
+
+<!-- Hanging cord -->
+<path d="M356 80 V220"
+    stroke="#850b22"
+    stroke-width="8"
+    stroke-linecap="round"/>
+
+<!-- Top beads -->
+<circle cx="356" cy="231" r="15"
+    fill="url(#bead)"
+    stroke="#93601c"
+    stroke-width="6"/>
+
+<circle cx="356" cy="265" r="21"
+    fill="url(#bead)"
+    stroke="#93601c"
+    stroke-width="7"/>
+
+<!-- Main lantern body -->
+<path d="
+    M356 320
+    C268 320 190 359 161 424
+    C128 498 158 568 211 610
+    C249 640 299 651 356 651
+    C413 651 463 640 501 610
+    C554 568 584 498 551 424
+    C522 359 444 320 356 320Z"
+    fill="url(#bodyRed)"
+    stroke="#850c25"
+    stroke-width="7"/>
+
+<!-- Side and lower shading -->
+<path d="M158 481 C153 548 204 611 279 643"
+    fill="none"
+    stroke="#a90c2d"
+    stroke-width="8"/>
+
+<path d="M554 481 C559 548 508 611 433 643"
+    fill="none"
+    stroke="#a90c2d"
+    stroke-width="8"/>
+
+<!-- Lantern ribs -->
+<g fill="none"
+    stroke="#950c29"
+    stroke-width="6"
+    stroke-linecap="round">
+
+    <path d="M356 325 C356 420 356 550 356 648"/>
+    <path d="M286 327 C245 393 243 568 309 649"/>
+    <path d="M426 327 C467 393 469 568 403 649"/>
+    <path d="M281 337 C203 379 166 477 192 559"/>
+    <path d="M431 337 C509 379 546 477 520 559"/>
+
+</g>
+
+<!-- Share Icon Border -->
+<g transform="translate(356 485)"
+    fill="none"
+    stroke="#850c25"
+    stroke-width="29"
+    stroke-linecap="round"
+    stroke-linejoin="round">
+
+    <path d="M-42 0 L42 -52"/>
+    <path d="M-42 0 L42 52"/>
+
+</g>
+
+<!-- Share Icon White Lines -->
+<g transform="translate(356 485)"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="18"
+    stroke-linecap="round"
+    stroke-linejoin="round">
+
+    <path d="M-42 0 L42 -52"/>
+    <path d="M-42 0 L42 52"/>
+
+</g>
+
+<!-- Bigger Share Dots with Border -->
+<g transform="translate(356 485)">
+
+    <circle cx="-48" cy="0" r="28"
+        fill="#ffffff"
+        stroke="#850c25"
+        stroke-width="8"/>
+
+    <circle cx="48" cy="-60" r="28"
+        fill="#ffffff"
+        stroke="#850c25"
+        stroke-width="8"/>
+
+    <circle cx="48" cy="60" r="28"
+        fill="#ffffff"
+        stroke="#850c25"
+        stroke-width="8"/>
+
+</g>
+
+<!-- Top gold fitting -->
+<rect x="280" y="288"
+    width="153" height="41"
+    rx="4"
+    fill="url(#gold)"
+    stroke="#92601e"
+    stroke-width="6"/>
+
+<path d="M302 291 V326 M400 291 V326 M414 291 V326"
+    stroke="#fff5cf"
+    stroke-width="5"
+    opacity=".9"/>
+
+<!-- Bottom gold fitting -->
+<rect x="280" y="647"
+    width="153" height="44"
+    rx="4"
+    fill="url(#gold)"
+    stroke="#92601e"
+    stroke-width="6"/>
+
+<path d="M302 650 V688 M400 650 V688 M414 650 V688"
+    stroke="#fff5cf"
+    stroke-width="5"/>
+
+<!-- Fringe -->
+<g fill="none"
+    stroke="#94601c"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round">
+
+    <path d="M292 691 V744 Q292 755 300 755 Q308 755 308 744 V691"/>
+    <path d="M310 691 V744 Q310 755 318 755 Q326 755 326 744 V691"/>
+    <path d="M328 691 V744 Q328 755 336 755 Q344 755 344 744 V691"/>
+    <path d="M346 691 V744 Q346 755 354 755 Q362 755 362 744 V691"/>
+    <path d="M364 691 V744 Q364 755 372 755 Q380 755 380 744 V691"/>
+    <path d="M382 691 V744 Q382 755 390 755 Q398 755 398 744 V691"/>
+    <path d="M400 691 V744 Q400 755 408 755 Q416 755 416 744 V691"/>
+    <path d="M418 691 V744 Q418 755 426 755 Q434 755 434 744 V691"/>
+
+</g>
+
+<!-- Independent animated tassel -->
+<g id="tassel">
+
+    <!-- Connector -->
+    <path d="M356 755 V779"
+        stroke="#870b24"
+        stroke-width="5"/>
+
+    <!-- Bottom bead -->
+    <circle cx="356" cy="795" r="17"
+        fill="url(#bead)"
+        stroke="#96601d"
+        stroke-width="6"/>
+
+    <!-- Tassel -->
+    <path d="
+        M356 812
+        C354 843 343 864 330 884
+        C325 894 336 902 342 890
+        C346 882 351 869 356 857
+        C352 881 345 900 340 915
+        C337 925 349 930 353 917
+        L359 883
+        C358 900 359 920 363 931
+        C367 942 379 935 375 924
+        C370 903 365 876 356 812Z"
+        fill="#ed1741"
+        stroke="#850b25"
+        stroke-width="6"
+        stroke-linejoin="round"/>
+
+    <path d="M356 817 C356 856 356 888 356 913"
+        fill="none"
+        stroke="#a90d31"
+        stroke-width="4"
+        stroke-linecap="round"/>
+
+</g>
+
+</svg>
