@@ -695,13 +695,9 @@ body.video-open {
 
 .product-code {
     color: var(--gold);
-
-    font-size: 10px;
-
+    font-size: 20px;
     font-weight: 800;
-
     letter-spacing: 0.7px;
-
     overflow-wrap: anywhere;
 }
 
