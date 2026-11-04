@@ -226,18 +226,12 @@ body.video-open {
 
 .search-box input {
     width: 100%;
-
     min-width: 0;
-
     padding: 0;
-
     border: none;
     outline: none;
-
     background: transparent;
-
     color: white;
-
     font-size: 12px;
 }
 
@@ -713,15 +707,10 @@ body.video-open {
 
 .product-name {
     margin-top: 4px;
-
     color: var(--text);
-
-    font-size: 12px;
-
+    font-size: 20px;
     font-weight: 600;
-
     line-height: 1.35;
-
     overflow-wrap: anywhere;
 }
 

@@ -398,6 +398,7 @@ function getFilteredProducts() {
             const matchesSearch =
                 String(product.id || "").toLowerCase().includes(keyword) ||
                 String(product.name || "").toLowerCase().includes(keyword) ||
+                String(product.eng_name || "").toLowerCase().includes(keyword) ||
                 String(product.code || "").toLowerCase().includes(keyword) ||
                 String(product.desc || "").toLowerCase().includes(keyword);
 
@@ -421,15 +422,15 @@ function renderProducts() {
 
     const filteredProducts = getFilteredProducts();
 
-const targetCount = filteredProducts.length;
+    const targetCount = filteredProducts.length;
 
-productCount.classList.remove("count-pop");
+    productCount.classList.remove("count-pop");
 
-// Restart animation
-void productCount.offsetWidth;
+    // Restart animation
+    void productCount.offsetWidth;
 
-productCount.textContent = `${targetCount} Products`;
-productCount.classList.add("count-pop");
+    productCount.textContent = `${targetCount} Products`;
+    productCount.classList.add("count-pop");
 
     emptyState.hidden = filteredProducts.length !== 0;
 
@@ -483,6 +484,9 @@ productCount.classList.add("count-pop");
 
                     <div class="product-name">
                         ${escapeHTML(product.name)}
+                    </div>
+                    <div class="product-eng-name">
+                        ${escapeHTML(product.eng_name)}
                     </div>
                     <div class="card-fireworks">
                         <img src="2026/media/fireworks.gif" class="fw">
