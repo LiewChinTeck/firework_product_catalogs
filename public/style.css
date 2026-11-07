@@ -1,42 +1,31 @@
-
 /* ==========================================
    FIREWORK CATALOGUE
    NEW YEAR DESIGN
 ========================================== */
-
 :root {
     --background: #100a1b;
     --surface: #21152d;
     --surface-light: #2c1d39;
-
     --gold: #f4c96b;
     --gold-light: #ffe5a1;
-
     --text: #fff8ed;
     --muted: #ad9db8;
-
     --border: rgba(244, 201, 107, 0.2);
 }
-
-
 /* ==========================================
    GLOBAL
 ========================================== */
-
 * {
     box-sizing: border-box;
 }
-
 html {
     min-height: 100%;
     background: var(--background);
     scroll-behavior: smooth;
 }
-
 /* ==========================================
    FULL PAGE VIDEO BACKGROUND
 ========================================== */
-
 .background-video {
     position: fixed;
     inset: 0;
@@ -44,20 +33,17 @@ html {
     overflow: hidden;
     pointer-events: none;
 }
-
 .background-video video {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
 .background-video::after {
     content: "";
     position: absolute;
     inset: 0;
     background: rgba(16, 10, 27, 0.65);
 }
-
 body {
     position: relative;
     margin: 0;
@@ -66,21 +52,16 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background: transparent;
 }
-
 button,
 input {
     font: inherit;
 }
-
 button {
     -webkit-tap-highlight-color: transparent;
 }
-
 body.video-open {
     overflow: hidden;
 }
-
-
 /* ==========================================
    HERO BANNER
 ========================================== */
@@ -90,53 +71,37 @@ body.video-open {
     padding: 0;
     overflow: hidden;
 }
-
 .hero-banner img {
     display: block;
     width: 100%;
     height: auto;
     object-fit: contain;
 }
-
 /* ==========================================
    MAIN CONTAINER
 ========================================== */
-
 .main-container {
     width: 100%;
     max-width: 1100px;
-
     margin: 0 auto;
-
     padding: 0 10px 10px;
 }
-
-
 /* ==========================================
    HERO BANNER
 ========================================== */
-
 .hero {
     position: relative;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
     min-height: 150px;
-
     margin: 10px 0;
-
     padding: 10px;
-
     overflow: hidden;
-
     text-align: center;
-
     border: 1px solid var(--border);
     border-radius: 10px;
-
     background:
         radial-gradient(
             circle at 15% 25%,
@@ -155,75 +120,48 @@ body.video-open {
             #382019
         );
 }
-
 .hero-decoration {
     color: var(--gold);
-
     font-size: 13px;
-
     letter-spacing: 5px;
 }
-
 .hero h2 {
     margin: 5px 0;
-
     font-family: Georgia, serif;
-
     font-size: clamp(30px, 8vw, 40px);
-
     line-height: 1.05;
-
     font-weight: 800;
 }
-
 .hero h2 span {
     color: var(--gold);
 }
-
 .hero p {
     margin: 5px 0 0;
-
     color: var(--muted);
-
     font-size: 10px;
-
     letter-spacing: 2px;
-
     text-transform: uppercase;
 }
-
-
 /* ==========================================
    SEARCH
 ========================================== */
-
 .search-section {
     margin: 10px 0;
 }
-
 .search-box {
     display: flex;
     align-items: center;
-
     height: 42px;
-
     padding: 0 10px;
-
     gap: 8px;
-
     border: 1px solid var(--border);
-
     border-radius: 8px;
-
     background: rgba(255, 255, 255, 0.04);
 }
-
 .search-icon {
     color: var(--gold);
-
     font-size: 24px;
 }
-
 .search-box input {
     width: 100%;
     min-width: 0;
@@ -234,30 +172,25 @@ body.video-open {
     color: white;
     font-size: 12px;
 }
-
 .search-box input::placeholder {
     color: #9c8da5;
 }
-
 /* Hide browser's default search clear button */
 .search-box input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;
     display: none;
 }
-
 /* Hide default clear button in Edge */
 .search-box input[type="search"]::-ms-clear {
     display: none;
 }
-
 /*Animation Search*/
 .search-icon {
     color: var(--gold);
     font-size: 24px;
     animation: searchPulse 1.8s ease-in-out infinite;
 }
-
 @keyframes searchPulse {
     0%, 100% {
         transform: scale(1);
@@ -268,18 +201,15 @@ body.video-open {
         opacity: 1;
     }
 }
-
 /*Typing animation*/
 .search-box {
     position: relative;
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
-
 .search-box:focus-within {
     border-color: var(--gold);
     box-shadow: 0 0 10px rgba(255, 200, 80, 0.2);
 }
-
 .search-box::after {
     content: "";
     position: absolute;
@@ -290,17 +220,14 @@ body.video-open {
     background: var(--gold);
     transition: width 0.3s ease, left 0.3s ease;
 }
-
 .search-box:focus-within::after {
     width: 100%;
     left: 0;
 }
-
 /*Product Count Pop Animation*/
 .count-pop {
     animation: countPop 0.3s ease;
 }
-
 @keyframes countPop {
     0% {
         transform: scale(1);
@@ -315,7 +242,6 @@ body.video-open {
         opacity: 1;
     }
 }
-
 /*Clear Search*/
 .clear-search {
     border: none;
@@ -325,51 +251,36 @@ body.video-open {
     cursor: pointer;
     padding: 0 5px;
 }
-
 .clear-search[hidden] {
     display: none;
 }
-
 /* ==========================================
    CATEGORY FILTERS
 ========================================== */
-
 .category-section {
     margin: 10px 0;
 }
-
 .category-filters {
     display: flex;
-
     gap: 6px;
-
     overflow-x: auto;
-
     padding-bottom: 3px;
-
     scrollbar-width: none;
 }
-
 .category-filters::-webkit-scrollbar {
     display: none;
 }
-
 .category-btn {
     flex: 0 0 auto;
     padding: 7px 11px;
-
     color: #d8cbdc;
     background: var(--surface);
-
     border: 1px solid var(--border);
     border-radius: 20px;
-
     font-size: 10px;
     font-weight: 600;
     white-space: nowrap;
-
     cursor: pointer;
-
     transition:
         color 0.25s ease,
         background 0.25s ease,
@@ -377,322 +288,227 @@ body.video-open {
         transform 0.2s ease,
         box-shadow 0.25s ease;
 }
-
 .category-btn.active {
     color: #24152a;
     background: var(--gold);
     border-color: var(--gold);
-
     box-shadow: 0 2px 10px rgba(244, 201, 107, 0.25);
 }
-
 .category-btn:active {
     transform: scale(0.94);
 }
-
 /*Switch Category Animation*/
 @keyframes categoryHighlight {
     0% {
         box-shadow: 0 0 0 rgba(244, 201, 107, 0);
         transform: scale(1);
     }
-
     50% {
         box-shadow: 0 0 14px rgba(244, 201, 107, 0.5);
         transform: scale(1.05);
     }
-
     100% {
         box-shadow: 0 2px 10px rgba(244, 201, 107, 0.25);
         transform: scale(1);
     }
 }
-
 .category-btn.active {
     animation: categoryHighlight 0.4s ease;
 }
-
 /*Smooth Transition*/
 @keyframes productFadeIn {
     from {
         opacity: 0;
         transform: translateY(10px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
-
 .product-card {
     animation: productFadeIn 0.35s ease both;
 }
-
 /* ==========================================
    STICKY SEARCH + CATEGORY
 ========================================== */
-
 .search-section {
     position: sticky;
     top: 0;
     z-index: 102;
-
     margin: 0 -10px;
     padding: 8px 10px;
-
     background: rgba(16, 10, 27, 0.96);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
     transform: translateY(0);
     opacity: 1;
-
     transition:
         transform 0.3s ease,
         opacity 0.3s ease;
 }
-
 /* Hide search when scrolling down */
 .search-section.search-hidden {
     transform: translateY(-110%);
     opacity: 0;
     pointer-events: none;
 }
-
 /* Sticky category */
 .category-section {
     position: sticky;
     top: 0;
     z-index: 101;
-
     margin: 0 -10px;
     padding: 8px 10px;
-
     background: rgba(16, 10, 27, 0.96);
-
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
     border-bottom: 1px solid var(--border);
-
     transition: top 0.3s ease;
 }
-
 /* Move category below search when search is visible */
 .category-section.search-visible {
     top: 58px;
 }
-
 /* Sticky shadow */
 .category-section.sticky-active {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
-
 /* ==========================================
    PRODUCT HEADING
 ========================================== */
-
 .product-heading {
     display: flex;
-
     align-items: center;
     justify-content: space-between;
-
     margin: 10px 0;
 }
-
 .product-heading h2 {
     margin: 0;
-
     font-family: Georgia, serif;
-
     font-size: 20px;
 }
-
 #productCount {
     color: var(--muted);
-
     font-size: 10px;
 }
-
-
 /* ==========================================
    PRODUCT GRID
 ========================================== */
-
 .product-grid {
     display: grid;
-
     grid-template-columns: repeat(2, minmax(0, 1fr));
-
     gap: 8px;
 }
-
-
 /* ==========================================
    PRODUCT CARD
 ========================================== */
-
 .product-card {
     display: block;
-
     min-width: 0;
-
     padding: 0;
-
     overflow: hidden;
-
     text-align: left;
-
     color: var(--text);
-
     background: linear-gradient(
         145deg,
         #291a36,
         #191020
     );
-
     border: 1px solid rgba(244, 201, 107, 0.18);
-
     border-radius: 9px;
-
     cursor: pointer;
-
     transition:
         transform 0.15s ease,
         border-color 0.15s ease;
 }
-
 .product-card:active {
     transform: scale(0.975);
 }
-
 .product-card:focus-visible {
     outline: 2px solid var(--gold);
-
     outline-offset: 2px;
 }
-
 /* ==========================================
    PRODUCT CARD LANTERN
 ========================================== */
-
 .product-card {
     position: relative;
 }
-
 .card-lantern {
     position: absolute;
     top: 4px;
     right: 4px;
-
     width: 48px;
     z-index: 10;
-
     transform-origin: 50% 7.8125%;
     will-change: transform;
-
     pointer-events: auto;
     cursor: pointer;
 }
-
 .card-lantern img {
     display: block;
     width: 100%;
     height: auto;
 }
-
 /* ==========================================
    PRODUCT IMAGE
 ========================================== */
-
 .product-image-wrapper {
     position: relative;
-
     width: 100%;
-
     aspect-ratio: 4 / 3;
-
     overflow: hidden;
-
     background: #30243a;
 }
-
 .product-image {
     display: block;
-
     width: 100%;
     height: 100%;
-
     aspect-ratio: 4 / 3;
-
     object-fit: cover;
 }
-
 .image-placeholder {
     display: none;
-
     position: absolute;
     inset: 0;
-
     place-items: center;
-
     color: var(--gold);
-
     background: #30243a;
-
     font-size: 28px;
 }
-
 /* Product image interaction */
 .product-card {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
-
 .product-card:active {
     transform: scale(0.97);
     border-color: var(--gold);
 }
-
 /* ==========================================
    PLAY ICON
 ========================================== */
-
 .play-icon {
     position: absolute;
-
     right: 7px;
     bottom: 7px;
-
     display: grid;
-
     width: 27px;
     height: 27px;
-
     place-items: center;
-
     color: #26162b;
-
     background: var(--gold);
-
     border-radius: 50%;
-
     font-size: 10px;
-
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
-
-
 /* ==========================================
    PRODUCT INFORMATION
 ========================================== */
-
 .product-info {
     padding: 7px;
 }
-
 .product-code {
     color: var(--gold);
     font-size: 20px;
@@ -700,7 +516,6 @@ body.video-open {
     letter-spacing: 0.7px;
     overflow-wrap: anywhere;
 }
-
 .product-name {
     margin-top: 4px;
     color: var(--text);
@@ -709,15 +524,12 @@ body.video-open {
     line-height: 1.35;
     overflow-wrap: anywhere;
 }
-
 /* ==========================================
    Product ID 
 ========================================== */
-
 .product-image-wrapper {
     position: relative;
 }
-
 .product-id {
     position: absolute;
     top: 5px;
@@ -731,7 +543,6 @@ body.video-open {
     border-radius: 3px;
     pointer-events: none;
 }
-
 /* ==========================================
    FIREWORK DECORATION 
 ========================================== */
@@ -744,182 +555,114 @@ body.video-open {
     pointer-events: none;
     z-index: 3;
 }
-
-
 /* ==========================================
    EMPTY STATE
 ========================================== */
-
 .empty-state {
     padding: 20px 10px;
-
     text-align: center;
-
     color: var(--muted);
-
     font-size: 13px;
 }
-
 .empty-state div {
     color: var(--gold);
-
     font-size: 30px;
 }
-
-
 /* ==========================================
    FOOTER
 ========================================== */
-
 .footer {
     padding: 15px 10px 20px;
-
     text-align: center;
-
     color: #9e8aa8;
-
     font-size: 9px;
-
     letter-spacing: 2px;
 }
-
 .footer p {
     margin: 0;
 }
-
 .footer p::first-letter {
     color: var(--gold);
 }
-
-
 /* ==========================================
    FULLSCREEN VIDEO VIEWER
 ========================================== */
-
 .video-viewer {
     position: fixed;
-
     inset: 0;
-
     z-index: 9999;
-
     display: none;
-
     align-items: center;
     justify-content: center;
-
     width: 100%;
     height: 100%;
-
     background: #000;
-
     overflow: hidden;
 }
-
 .video-viewer.open {
     display: flex;
 }
-
 .video-viewer video {
     display: block;
-
     width: 100%;
     height: 100%;
-
     max-width: 100%;
-
     object-fit: contain;
-
     background: #000;
 }
-
-
 /* ==========================================
    CLOSE BUTTON
 ========================================== */
-
 .close-video {
     position: absolute;
-
     top: max(10px, env(safe-area-inset-top));
-
     right: 10px;
-
     z-index: 10000;
-
     display: grid;
-
     width: 40px;
     height: 40px;
-
     place-items: center;
-
     padding: 0;
-
     color: white;
-
     background: rgba(0, 0, 0, 0.6);
-
     border: 1px solid rgba(255, 255, 255, 0.5);
-
     border-radius: 50%;
-
     font-size: 30px;
     font-weight: 300;
-
     line-height: 1;
-
     cursor: pointer;
 }
-
 .close-video:active {
     background: rgba(255, 255, 255, 0.25);
 }
-
-
 /* ==========================================
    TABLET
 ========================================== */
-
 @media (min-width: 600px) {
-
     .main-container {
         padding-left: 10px;
         padding-right: 10px;
     }
-
     .product-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-
         gap: 10px;
     }
-
     .product-name {
         font-size: 13px;
     }
-
 }
-
-
 /* ==========================================
    DESKTOP
 ========================================== */
-
 @media (min-width: 900px) {
-
     .product-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-
 }
-
-
 /* ==========================================
    REDUCE ANIMATIONS
 ========================================== */
-
 @media (prefers-reduced-motion: reduce) {
-
     *,
     *::before,
     *::after {
@@ -930,5 +673,4 @@ body.video-open {
 .category-btn.active {
     animation: none !important;
 }
-
 }
